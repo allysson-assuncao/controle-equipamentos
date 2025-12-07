@@ -1,0 +1,93 @@
+body {
+    font-family: sans-serif;
+    background: #f4f4f4;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #333;
+    color: white;
+}
+
+.ocupado {
+    background-color: #ffebeb;
+}
+
+.livre {
+    background-color: #eaffea;
+}
+
+.badge-livre {
+    color: green;
+    font-weight: bold;
+}
+
+.badge-ocupado {
+    color: red;
+    font-weight: bold;
+}
+
+input, select, button {
+    padding: 8px;
+    margin: 5px 0;
+}
+
+button {
+    cursor: pointer;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-sair {
+    color: red;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.sucesso {
+    color: green;
+    background: #d4edda;
+    padding: 10px;
+}
+
+.erro {
+    color: red;
+    background: #f8d7da;
+    padding: 10px;
+}
