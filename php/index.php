@@ -1,5 +1,6 @@
 <?php
 // index.php
+global $pdo;
 session_start();
 require 'db.php';
 

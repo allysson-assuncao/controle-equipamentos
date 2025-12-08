@@ -1,5 +1,6 @@
 <?php
 // setup.php
+global $pdo;
 require 'db.php';
 
 try {
