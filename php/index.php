@@ -4,29 +4,52 @@ global $pdo;
 session_start();
 require 'db.php';
 
-// Lógica de Login/Cadastro misturada no topo do arquivo (Clássico PHP Estrutural)
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nome = $_POST['nome'];
+$erro = "";
 
-    // Verifica se usuário existe
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $nome = trim($_POST['nome']);
+    $senha = $_POST['senha'];
+
+    // 1. Verifica se usuário existe
     $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE nome = ?");
     $stmt->execute([$nome]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-        // Login
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_nome'] = $user['nome'];
-        header("Location: dashboard.php");
-        exit;
+        // --- CENÁRIO: LOGIN ---
+        // Verifica a hash da senha
+        if (password_verify($senha, $user['senha'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_nome'] = $user['nome'];
+            header("Location: dashboard.php");
+            exit;
+        } else {
+            $erro = "Usuário existe, mas a senha está incorreta.";
+        }
     } else {
-        // Cadastro automático (simplificação)
-        $stmt = $pdo->prepare("INSERT INTO usuarios (nome) VALUES (?)");
-        $stmt->execute([$nome]);
-        $_SESSION['user_id'] = $pdo->lastInsertId();
-        $_SESSION['user_nome'] = $nome;
-        header("Location: dashboard.php");
-        exit;
+        // --- CENÁRIO: CADASTRO ---
+        // Validação: Min 4 chars, 1 Maiúscula, 1 Minúscula
+        // Regex: (?=.*[A-Z]) garante maiuscula, (?=.*[a-z]) garante minuscula, .{4,} garante tamanho
+        if (preg_match('/(?=.*[a-z])(?=.*[A-Z]).{4,}/', $senha)) {
+
+            // Cria hash segura (nunca salve senha pura!)
+            $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+
+            try {
+                $stmt = $pdo->prepare("INSERT INTO usuarios (nome, senha) VALUES (?, ?)");
+                $stmt->execute([$nome, $senhaHash]);
+
+                // Loga direto após cadastrar
+                $_SESSION['user_id'] = $pdo->lastInsertId();
+                $_SESSION['user_nome'] = $nome;
+                header("Location: dashboard.php");
+                exit;
+            } catch (Exception $e) {
+                $erro = "Erro ao cadastrar: " . $e->getMessage();
+            }
+        } else {
+            $erro = "Senha fraca! Use no mínimo 4 caracteres, com 1 maiúscula e 1 minúscula.";
+        }
     }
 }
 ?>
@@ -35,17 +58,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Controle de Equipamentos</title>
+    <title>Acesso - Controle</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Acesso ao Sistema</h1>
-        <p>Entre com seu nome. Se não existir, será criado automaticamente.</p>
-        <form method="POST">
-            <input type="text" name="nome" placeholder="Seu nome" required>
-            <button type="submit">Entrar / Cadastrar</button>
-        </form>
-    </div>
+<div class="container login-box">
+    <h1>Entrar / Cadastrar</h1>
+
+    <?php if ($erro): ?>
+        <p class="erro"><?php echo $erro; ?></p>
+    <?php endif; ?>
+
+    <form method="POST">
+        <label>Usuário:</label>
+        <input type="text" name="nome" placeholder="Seu nome" required
+               value="<?php echo isset($_POST['nome']) ? $_POST['nome'] : ''; ?>"><br>
+
+        <label>Senha:</label>
+        <input type="password" name="senha" placeholder="Min 4 chars (1 Maiús, 1 Minús)" required><br>
+
+        <button type="submit">Acessar</button>
+    </form>
+    <p><small>Se o nome não existir, será criado um novo cadastro com essa senha.</small></p>
+</div>
 </body>
 </html>

@@ -4,31 +4,33 @@ global $pdo;
 require 'db.php';
 
 try {
-    // Tabela de Usuários
-    $pdo->exec("CREATE TABLE IF NOT EXISTS usuarios (
+    // DROP TABLE força o reset para garantir a nova estrutura
+    $pdo->exec("DROP TABLE IF EXISTS equipamentos");
+    $pdo->exec("DROP TABLE IF EXISTS usuarios");
+
+    // Tabela de Usuários com SENHA
+    $pdo->exec("CREATE TABLE usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL
+        nome TEXT NOT NULL UNIQUE,
+        senha TEXT NOT NULL
     )");
 
-    // Tabela de Equipamentos
-    // status: 0 = livre, 1 = reservado
-    // reservado_ate: timestamp do fim da reserva
-    $pdo->exec("CREATE TABLE IF NOT EXISTS equipamentos (
+    // Tabela de Equipamentos com TOTAL_USOS
+    $pdo->exec("CREATE TABLE equipamentos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         status INTEGER DEFAULT 0,
         usuario_id INTEGER,
         reservado_ate DATETIME,
+        total_usos INTEGER DEFAULT 0,
         FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
     )");
 
-    // Inserir alguns dados de exemplo se estiver vazio
-    $res = $pdo->query("SELECT COUNT(*) FROM equipamentos");
-    if ($res->fetchColumn() == 0) {
-        $pdo->exec("INSERT INTO equipamentos (nome) VALUES ('Projetor Epson'), ('Notebook Dell'), ('Caixa de Som JBL')");
-    }
+    // Dados iniciais
+    $pdo->exec("INSERT INTO equipamentos (nome) VALUES ('Projetor Epson'), ('Notebook Dell'), ('Caixa de Som JBL'), ('Tablet Gráfico')");
 
-    echo "Banco de dados e tabelas criados com sucesso! <a href='index.php'>Ir para Home</a>";
+    echo "<h3>Banco de dados atualizado!</h3>";
+    echo "<a href='index.php'>Ir para Login</a>";
 
 } catch (Exception $e) {
     echo "Erro ao configurar banco: " . $e->getMessage();
