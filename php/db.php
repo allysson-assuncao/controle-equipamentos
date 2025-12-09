@@ -1,5 +1,4 @@
 <?php
-// db.php
 // Conexão simples usando SQLite para facilitar
 try {
     // Cria o arquivo database.sqlite automaticamente se não existir

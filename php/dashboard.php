@@ -1,5 +1,4 @@
 <?php
-// dashboard.php
 global $pdo;
 session_start();
 require 'db.php';
@@ -13,10 +12,10 @@ if (!isset($_SESSION['user_id'])) {
 $mensagem = "";
 $user_id = $_SESSION['user_id'];
 
-// 1. AUTO-LIBERAÇÃO (Lazy Load)
+// 1. Auto-Liberação dos equipamentos (Lazy Load)
 $pdo->exec("UPDATE equipamentos SET status = 0, usuario_id = NULL, reservado_ate = NULL WHERE reservado_ate < datetime('now', 'localtime') AND status = 1");
 
-// 2. AÇÃO: RESERVAR
+// 2. Ação: Reservar
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reservar'])) {
     $equip_id = $_POST['equip_id'];
     $minutos = (int)$_POST['minutos'];
@@ -27,20 +26,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reservar'])) {
     $equip = $stmt->fetch();
 
     if ($equip && $equip['status'] == 0) {
-        // Atualiza status, define timer E incrementa contador de uso
+        // Atualiza status, define timer e incrementa contador de uso
         $stmt = $pdo->prepare("UPDATE equipamentos SET status = 1, usuario_id = ?, reservado_ate = datetime('now', 'localtime', '+' || ? || ' minutes'), total_usos = total_usos + 1 WHERE id = ?");
         $stmt->execute([$user_id, $minutos, $equip_id]);
         $mensagem = "<p class='sucesso'>Reserva confirmada!</p>";
-    }/* else {
-        $mensagem = "<p class='erro'>Equipamento indisponível.</p>";
-    }*/
+    }
 }
 
-// 3. AÇÃO: DEVOLVER (Liberar antecipadamente)
+// 3. Ação: Devolver (Liberar antecipadamente)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['devolver'])) {
     $equip_id = $_POST['equip_id'];
 
-    // Só libera se o equipamento estiver com O USUÁRIO LOGADO
+    // Só libera se o equipamento estiver com o usuário que reservou logado
     $stmt = $pdo->prepare("UPDATE equipamentos SET status = 0, usuario_id = NULL, reservado_ate = NULL WHERE id = ? AND usuario_id = ?");
     $stmt->execute([$equip_id, $user_id]);
 
@@ -51,14 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['devolver'])) {
     }
 }
 
-// 4. AÇÃO: NOVO EQUIPAMENTO
+// 4. Ação: Novo equipamento
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['novo_equipamento'])) {
     $nome = $_POST['nome_equipamento'];
     $pdo->prepare("INSERT INTO equipamentos (nome) VALUES (?)")->execute([$nome]);
     $mensagem = "<p class='sucesso'>Adicionado!</p>";
 }
 
-// 5. LISTAGEM
+// 5. Listagem dos equipamentos
 $sql = "SELECT e.*, u.nome as nome_usuario 
         FROM equipamentos e 
         LEFT JOIN usuarios u ON e.usuario_id = u.id";
