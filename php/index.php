@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-        // --- Cenário: LOGIN ---
+        // --- Cenário: Login ---
         // Verifica a hash da senha
         if (password_verify($senha, $user['senha'])) {
             $_SESSION['user_id'] = $user['id'];
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $erro = "Usuário existe, mas a senha está incorreta.";
         }
     } else {
-        // --- Cenário: CADASTRO ---
+        // --- Cenário: Cadastro ---
         // Validação: Min 4 chars, 1 Maiúscula, 1 Minúscula
         if (preg_match('/(?=.*[a-z])(?=.*[A-Z]).{4,}/', $senha)) {
 
