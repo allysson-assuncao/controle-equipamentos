@@ -21,15 +21,34 @@ body {
     align-items: center;
 }
 
+.scroll-box {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    margin-bottom: 20px;
+    background: #fff;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
 }
 
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
+th {
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    color: #495057;
+    padding: 12px;
+    border-bottom: 2px solid #dee2e6;
+    z-index: 2;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
     text-align: left;
 }
 
@@ -74,10 +93,46 @@ button:disabled {
     cursor: not-allowed;
 }
 
+.btn-reservar {
+    background: #28a745;
+}
+
+.btn-reservar:hover {
+    background: #218838;
+}
+
+.btn-devolver {
+    background: #ffc107;
+    color: #333;
+    font-weight: bold;
+}
+
+.btn-devolver:hover {
+    background: #e0a800;
+}
+
+.btn-add {
+    background: #007bff;
+}
+
+.btn-disabled {
+    background: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed;
+}
+
 .btn-sair {
-    color: red;
+    color: #ff6b6b;
     text-decoration: none;
     font-weight: bold;
+    border: 1px solid #ff6b6b;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.btn-sair:hover {
+    background: #ff6b6b;
+    color: white;
 }
 
 .sucesso {
